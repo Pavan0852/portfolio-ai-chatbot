@@ -17,6 +17,9 @@ jobs:
     name: Run Backend Tests
     runs-on: ubuntu-latest
 
+    env:
+      LLM_API_KEY: ci-test-placeholder
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
