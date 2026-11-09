@@ -37,17 +37,30 @@ def test_chat_endpoint_returns_answer_and_sources():
 
 
 def test_chat_endpoint_rejects_blank_message():
-    with TestClient(app) as client:
-        response = client.post("/api/chat", json={"message": "   "})
+    app.dependency_overrides[get_chat_service] = lambda: FakeChatService()
 
-    assert response.status_code == 422
+    try:
+        with TestClient(app) as client:
+            response = client.post(
+                "/api/chat",
+                json={"message": "   "},
+            )
+
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_chat_endpoint_rejects_oversized_message():
-    with TestClient(app) as client:
-        response = client.post(
-            "/api/chat",
-            json={"message": "x" * 2001},
-        )
+    app.dependency_overrides[get_chat_service] = lambda: FakeChatService()
 
-    assert response.status_code == 422
+    try:
+        with TestClient(app) as client:
+            response = client.post(
+                "/api/chat",
+                json={"message": "x" * 2001},
+            )
+
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.clear()
